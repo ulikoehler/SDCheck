@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     //Write 4k blocks until the write fails
-    const size_t bufsize = 64*512;
+    const size_t bufsize = 128*512;
     char writeBuffer[bufsize];
     uint64_t writePosition = 0;
     while(true) {
