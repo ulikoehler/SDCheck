@@ -58,23 +58,22 @@ int main(int argc, char** argv) {
     randomGen.seed(seed);
     refGen.seed(seed);
     //Open file to read/write to
-    int fd = open(argv[1], O_RDWR);
+    int fd = open(argv[1], O_RDWR | O_SYNC);
     if(fd == -1) {
         cerr << "Failed to open file: " << strerror(errno) << endl;
         return 1;
     }
     //Write 4k blocks until the write fails
-    const size_t bufsize = 32768;
+    const size_t bufsize = 64*512;
     char writeBuffer[bufsize];
     uint64_t writePosition = 0;
     while(true) {
         fillMemRandom(writeBuffer, bufsize, randomGen);
         //We use the POSIX pwrite API instead of libc files for performance reasons here
         if(pwrite(fd, writeBuffer, bufsize, writePosition) == -1) {
-            cerr << "Write failed at " << (writePosition / (1024*1024)) << " MiB: "
+            cerr << "Write failed at " << (writePosition / (1024*1024)) << " MiB (block " 
+                 << (writePosition / 512) << "): "
                  << strerror(errno) << endl;
-            //The last block is the last valid position
-            writePosition -= bufsize;
             break;
         }
         //Statistics
