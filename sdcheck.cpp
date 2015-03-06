@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
     //Flush file so that data is not cached but physically present on device
     fsync(fd);
     close(fd);
+    cout << "Write finished - reading written data" << endl;
     //Reopen buffer
     fd = open(argv[1], O_RDWR);
     if(fd == -1) {
