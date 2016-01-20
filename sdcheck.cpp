@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
             break;
         }
         //Statistics
-        if(writePosition % (1024*1024) == 0) {
+        if(writePosition % (1024*1024 * 10) == 0) {
             cout << "Wrote " << (writePosition / (1024*1024)) << " MiB..." << endl;
         }
         //Advance write offset
@@ -108,8 +108,8 @@ int main(int argc, char** argv) {
             continue;
         }
         //Statistics
-        if(writePosition % (1024*1024) == 0) {
-            cout << "Wrote " << (writePosition / (1024*1024)) << " MiB..." << endl;
+        if(readPosition % (1024*1024 * 10) == 0) {
+            cout << "Read " << (readPosition / (1024*1024)) << " MiB..." << endl;
         }
         //Compare memoriess
         if(memcmp(readBuffer, writeBuffer, bufsize) != 0) {
