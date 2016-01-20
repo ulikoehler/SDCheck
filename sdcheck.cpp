@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
             continue;
         }
         //Statistics
-        if(readPosition % (1024*1024 * 10) == 0) {
+        if(readPosition % (1024*1024 * 100) == 0) {
             cout << "Read " << (readPosition / (1024*1024)) << " MiB..." << endl;
         }
         //Compare memoriess
