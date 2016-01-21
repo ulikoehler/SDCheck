@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <string>
 #include <random>
@@ -51,7 +52,15 @@ static void fillMemRandom(char* mem, size_t size, std::mt19937_64& rng) {
 int main(int argc, char** argv) {
     //Check arguments
     if(argc < 2) {
-        cerr << "Usage: " << argv[0] << " </dev/sdx>" << endl;
+        cerr << "Usage: " << argv[0] << " </dev/sdx> [<start offset>]" << endl;
+        return 1;
+    }
+    uint64_t writePosition = 0;
+    uint64_t readPosition = 0;
+    if(argc >= 3) {
+        writePosition = boost::lexical_cast<uint64_t>(argv[2]) * 1024 * 1024;
+        readPosition = writePosition;
+        cout << "Using write offset: " << (writePosition / (1024 * 1024)) << " MiB" << endl;
     }
     //Seed RNGs
     uint64_t seed = generateSeed();
@@ -66,7 +75,6 @@ int main(int argc, char** argv) {
     //Write 4k blocks until the write fails
     const size_t bufsize = 128*512;
     char writeBuffer[bufsize];
-    uint64_t writePosition = 0;
     while(true) {
         fillMemRandom(writeBuffer, bufsize, randomGen);
         //We use the POSIX pwrite API instead of libc files for performance reasons here
@@ -97,7 +105,7 @@ int main(int argc, char** argv) {
     char readBuffer[bufsize];
     uint64_t compareErrorCount = 0; //Unit: blocks (of size bufsize)
     uint64_t readErrorCount = 0;
-    for (uint64_t readPosition = 0; readPosition < writePosition; readPosition += bufsize) {
+    for (; readPosition < writePosition; readPosition += bufsize) {
         //Generate the same random number stream
         fillMemRandom(writeBuffer, bufsize, refGen);
         //Read the actual data
